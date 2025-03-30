@@ -72,7 +72,7 @@ Steps
 
 ```bash
 git clone https://github.com/Strider1881/Atlan-API-Observability-Dashboard.git
-cd Atlan-API-Observability-Dashboard
+cd Atlan-API-Observability-Dashboard`
 
 
 2.Open the dashboard:<br>
