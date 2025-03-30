@@ -132,7 +132,7 @@ These improvements have significantly reduced debugging time and enhanced team p
 
 - Integrate machine learning models for predictive analytics.
 
-# **📄 Deliverables**
+## **📄 Deliverables**
 **- Dashboard Implementation**: HTML File
 
 **- Documentation:**
@@ -143,9 +143,9 @@ These improvements have significantly reduced debugging time and enhanced team p
 
 **- Dashboard Screenshot:** Sample Dashboard
 
-# **🤝 Contributing**
+## **🤝 Contributing**
 Contributions are welcome! Please fork the repository and submit a pull request with detailed explanations of your changes.
 
-**📧 Contact**
+## **📧 Contact**
 For queries or feedback, please reach out at gsroop2306@gmail.com .
 
