@@ -2,7 +2,7 @@
 # Atlan API Observability Dashboard
 This repository contains the solution for the Atlan Platform Internship Challenge 2025 - Observability. The goal of this project is to improve debugging efficiency by implementing observability solutions that track key metrics, monitor system performance, and provide actionable insights.
 
-##📋 Project Overview
+#📋 Project Overview
 - The goal of this project is to enhance observability for Atlan's API ecosystem by:
 
 - Monitoring critical API performance metrics (response times, error rates, throughput).
@@ -15,31 +15,31 @@ This repository contains the solution for the Atlan Platform Internship Challeng
 
 This solution is designed to address inefficiencies in debugging workflows and improve response times for identifying and resolving issues.
 
-##🛠️ Features
+#🛠️ Features
 
-##API Performance Metrics:
+#API Performance Metrics:
 
   - Tracks response times (p50, p90, p99), request rates, and error rates.
 
   - Identifies slow endpoints and high-error-rate APIs.
 
-##Database Monitoring:
+#Database Monitoring:
 
 - Monitors query execution time, throughput, and cache hit/miss ratios.
 
-##System Resource Utilization:
+#System Resource Utilization:
 
 - Tracks CPU usage, memory consumption, disk I/O, and network latency.
 
-##Request Tracing:
+#Request Tracing:
 
 - Follows requests across services to pinpoint bottlenecks.
 
-##Error Detection & Alerts:
+#Error Detection & Alerts:
 
 - Categorizes errors (e.g., 500 Database Timeout, 503 Service Unavailable) and triggers alerts for abnormal patterns.
 
-###📊 Dashboard Preview
+#📊 Dashboard Preview
 The project includes a sample dashboard showcasing real-time metrics:
 
 |Metric                 |	Description                             |
@@ -48,10 +48,10 @@ The project includes a sample dashboard showcasing real-time metrics:
 |Error Rate	            | Monitors failure percentages            |
 |CPU & Memory Usage    	| Displays resource consumption           |
 
-##Sample Dashboard Screenshot:
+#Sample Dashboard Screenshot:
 ![Dashboard Example](docs/dashboard
 
-###📂Repository Structure
+#📂Repository Structure
 
 📂 Atlan-API-Observability-Dashboard. <br>
 ├── 📂 docs <br>
@@ -63,7 +63,7 @@ The project includes a sample dashboard showcasing real-time metrics:
 ├── README.md                    # Project documentation (this file)<br>
 
 
-###🚀 Getting Started
+#🚀 Getting Started
 #Prerequisites
 To view or extend the project:
 
@@ -94,6 +94,7 @@ cd Atlan-API-Observability-Dashboard
 - Refer to ATLAN-Internship-Challenge.pdf for challenge details.
 
 #🖥️ **Key Components**
+
 #**Observability Framework: OpenTelemetry**
 The solution uses OpenTelemetry as a framework for collecting metrics, logs, and traces across services. This ensures compatibility with various monitoring tools while providing comprehensive system insights.
 
