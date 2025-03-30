@@ -67,15 +67,16 @@ Ensure you have a browser to open the HTML file (Atlan-API-Observability-Dashboa
 Optionally use tools like Grafana or Kibana if you want to implement similar dashboards.
 
 Steps
-Clone this repository:
 
-bash
-git clone https://github.com/yourusername/Atlan-API-Observability-Dashboard.git
-cd Atlan-API-Observability-Dashboard
+1.Clone this repository:<br>
 
-Open the dashboard:
+bash<br>
+git clone https://github.com/Strider1881/Atlan-API-Observability-Dashboard.git <br>
+cd Atlan-API-Observability-Dashboard<br>
 
-Navigate to assets/Atlan-API-Observability-Dashboard.html.
+Open the dashboard:<br>
+
+Navigate to assets/Atlan-API-Observability-Dashboard.html.<br>
 
 Open the file in your preferred browser to view the sample dashboard.
 
