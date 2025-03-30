@@ -136,11 +136,9 @@ These improvements have significantly reduced debugging time and enhanced team p
 **- Dashboard Implementation**: HTML File
 
 **- Documentation:**
-
-     - Explanatory Document
-
-     - Challenge Description
-
+- Explanatory Document
+- Challange Description
+  
 **- Dashboard Screenshot:** Sample Dashboard
 
 ## **🤝 Contributing**
