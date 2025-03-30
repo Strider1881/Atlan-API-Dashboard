@@ -2,6 +2,10 @@
 # Atlan API Observability Dashboard
 This repository contains the solution for the Atlan Platform Internship Challenge 2025 - Observability. The goal of this project is to improve debugging efficiency by implementing observability solutions that track key metrics, monitor system performance, and provide actionable insights.
 
+
+
+🔗 **Live Demo:** [View the Hosted Dashboard](https://Strider1881.github.io/Atlan-API-Observability-Dashboard/)
+
 ## 📋 Project Overview
 - The goal of this project is to enhance observability for Atlan's API ecosystem by:
 
