@@ -48,14 +48,14 @@ CPU & Memory Usage	Displays resource consumption.
 Sample Dashboard Screenshot:
 ![Dashboard Example](docs/dashboard Repository Structure
 
-📂 Atlan-API-Observability-Dashboard
-├── 📂 docs
-│   ├── observability.pdf        # Explanatory document with design decisions
-│   ├── ATLAN-Internship-Challenge.pdf # Detailed challenge description
-│   ├── dashboard_image.png      # Sample dashboard screenshot
-├── 📂 assets
-│   └── Atlan-API-Observability-Dashboard.html # Dashboard implementation (HTML)
-├── README.md                    # Project documentation (this file)
+📂 Atlan-API-Observability-Dashboard.<br>
+├── 📂 docs<br>
+│   ├── observability.pdf        # Explanatory document with design decisions<br>
+│   ├── ATLAN-Internship-Challenge.pdf # Detailed challenge description<br>
+│   ├── dashboard_image.png      # Sample dashboard screenshot<br>
+├── 📂 assets<br>
+│   └── Atlan-API-Observability-Dashboard.html # Dashboard implementation (HTML)<br>
+├── README.md                    # Project documentation (this file)<br>
 
 
 🚀 Getting Started
