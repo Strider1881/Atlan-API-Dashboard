@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Atlan API Observability Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        .real-time-indicator {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .dashboard-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+        }
+        .time-range select {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .tabs {
+            display: flex;
+        }
+        .tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom: 2px solid #3498db;
+            font-weight: bold;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .card-toolbar {
+            display: flex;
+            gap: 10px;
+        }
+        .card-toolbar button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        .chart-container {
+            position: relative;
+            height: 200px;
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .kpi-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .kpi-card h3 {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .kpi-card p {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        .kpi-trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        .up {
+            color: #2ecc71;
+        }
+        .down {
+            color: #e74c3c;
+        }
+        .error-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .error-table th, .error-table td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .error-table th {
+            font-weight: 500;
+            color: #666;
+        }
+        .endpoint {
+            grid-column: span 8;
+        }
+        .kpis {
+            grid-column: span 4;
+        }
+        .errors, .resources {
+            grid-column: span 6;
+        }
+        .half {
+            grid-column: span 6;
+        }
+        .full {
+            grid-column: span 12;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .badge-error {
+            background-color: #ffebee;
+            color: #e53935;
+        }
+        .badge-warning {
+            background-color: #fff8e1;
+            color: #ffb300;
+        }
+        .badge-info {
+            background-color: #e3f2fd;
+            color: #1e88e5;
+        }
+        .service-map {
+            grid-column: span 12;
+            height: 240px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .service {
+            text-align: center;
+            padding: 10px;
+            width: 100px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+        .service::after {
+            content: "→";
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: #ddd;
+        }
+        .service:last-child::after {
+            display: none;
+        }
+        .service.slow {
+            border: 1px solid #ffb300;
+        }
+        .service.error {
+            border: 1px solid #e53935;
+        }
+        .user-path-analysis {
+            grid-column: span 12;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #3498db;
+        }
+        .frontend-metrics, .backend-metrics {
+            grid-column: span 6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Atlan API Observability Dashboard</h1>
+        <div class="real-time-indicator">
+            <span class="status-dot"></span>
+            Live Data - Updated <span id="last-update">just now</span>
+        </div>
+    </div>
+    
+    <div class="dashboard-controls">
+        <div class="time-range">
+            <select id="timeRange">
+                <option value="15m">Last 15 minutes</option>
+                <option value="1h" selected>Last 1 hour</option>
+                <option value="6h">Last 6 hours</option>
+                <option value="24h">Last 24 hours</option>
+                <option value="7d">Last 7 days</option>
+            </select>
+        </div>
+        <div class="tabs">
+            <div class="tab active">Overview</div>
+            <div class="tab">Frontend</div>
+            <div class="tab">Backend</div>
+            <div class="tab">Services</div>
+            <div class="tab">Logs</div>
+        </div>
+    </div>
+    
+    <div class="dashboard">
+        <!-- API Endpoint Performance -->
+        <div class="card endpoint">
+            <div class="card-header">
+                <h2>API Response Time by Endpoint</h2>
+                <div class="card-toolbar">
+                    <button>⚙️</button>
+                    <button>↓</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="endpointChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- KPIs -->
+        <div class="card kpis">
+            <div class="card-header">
+                <h2>Key Performance Indicators</h2>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Avg Response Time</h3>
+                    <p>238 ms</p>
+                    <div class="kpi-trend down">↓ 12% from avg</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Error Rate</h3>
+                    <p>1.4%</p>
+                    <div class="kpi-trend up">↑ 0.3% from avg</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Requests/Min</h3>
+                    <p>1,752</p>
+                    <div class="kpi-trend up">↑ 15% from avg</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Concurrent Users</h3>
+                    <p>427</p>
+                    <div class="kpi-trend up">↑ 12% from avg</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Database Load</h3>
+                    <p>68%</p>
+                    <div class="kpi-trend up">↑ 8% from avg</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Cache Hit Rate</h3>
+                    <p>91.2%</p>
+                    <div class="kpi-trend down">↓ 2% from avg</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Error Analysis -->
+        <div class="card errors">
+            <div class="card-header">
+                <h2>Recent Errors</h2>
+            </div>
+            <table class="error-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Endpoint</th>
+                        <th>Error</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2 min ago</td>
+                        <td>/api/dashboard/metrics</td>
+                        <td><span class="badge badge-error">500</span> Database timeout</td>
+                        <td>14</td>
+                    </tr>
+                    <tr>
+                        <td>5 min ago</td>
+                        <td>/api/users/profile</td>
+                        <td><span class="badge badge-warning">404</span> User not found</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>12 min ago</td>
+                        <td>/api/reports/generate</td>
+                        <td><span class="badge badge-error">503</span> Service unavailable</td>
+                        <td>23</td>
+                    </tr>
+                    <tr>
+                        <td>18 min ago</td>
+                        <td>/api/auth/validate</td>
+                        <td><span class="badge badge-info">401</span> Token expired</td>
+                        <td>31</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Resource Utilization -->
+        <div class="card resources">
+            <div class="card-header">
+                <h2>Resource Utilization</h2>
+            </div>
+            <div class="chart-container">
+                <canvas id="resourceChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Frontend Metrics -->
+        <div class="card frontend-metrics">
+            <div class="card-header">
+                <h2>Frontend Performance</h2>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Page Load Time</h3>
+                    <p>1.8s</p>
+                    <div class="kpi-trend down">↓ 0.3s from avg</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>First Paint</h3>
+                    <p>0.7s</p>
+                    <div class="kpi-trend down">↓ 0.1s from avg</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>JS Errors</h3>
+                    <p>12</p>
+                    <div class="kpi-trend up">↑ 5 from avg</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="frontendChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Backend Metrics -->
+        <div class="card backend-metrics">
+            <div class="card-header">
+                <h2>Backend Performance</h2>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Query Time</h3>
+                    <p>89ms</p>
+                    <div class="kpi-trend up">↑ 12ms from avg</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>API Errors</h3>
+                    <p>74</p>
+                    <div class="kpi-trend up">↑ 23 from avg</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>CPU Load</h3>
+                    <p>72%</p>
+                    <div class="kpi-trend up">↑ 15% from avg</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="backendChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Service Dependency Map -->
+        <div class="card service-map">
+            <div class="service">
+                <div>Client App</div>
+                <div>1.2s</div>
+            </div>
+            <div class="service">
+                <div>API Gateway</div>
+                <div>24ms</div>
+            </div>
+            <div class="service slow">
+                <div>Auth Service</div>
+                <div>320ms</div>
+            </div>
+            <div class="service">
+                <div>User Service</div>
+                <div>68ms</div>
+            </div>
+            <div class="service error">
+                <div>Report Service</div>
+                <div>503ms</div>
+            </div>
+            <div class="service">
+                <div>Database</div>
+                <div>89ms</div>
+            </div>
+        </div>
+        
+        <!-- User Path Analysis -->
+        <div class="card user-path-analysis">
+            <div class="card-header">
+                <h2>User Journey Completion</h2>
+            </div>
+            <table class="error-table">
+                <thead>
+                    <tr>
+                        <th>Journey</th>
+                        <th>Completion Rate</th>
+                        <th>Avg Duration</th>
+                        <th>Drop-off Point</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>User Registration</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 82%"></div>
+                            </div>
+                            82%
+                        </td>
+                        <td>1m 24s</td>
+                        <td>Email Verification</td>
+                    </tr>
+                    <tr>
+                        <td>Report Generation</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 67%"></div>
+                            </div>
+                            67%
+                        </td>
+                        <td>2m 38s</td>
+                        <td>Report Configuration</td>
+                    </tr>
+                    <tr>
+                        <td>Dashboard Creation</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 91%"></div>
+                            </div>
+                            91%
+                        </td>
+                        <td>3m 12s</td>
+                        <td>Widget Selection</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Update the "last updated" text periodically
+        function updateLastUpdated() {
+            const lastUpdate = document.getElementById('last-update');
+            lastUpdate.textContent = 'just now';
+            
+            setTimeout(() => {
+                lastUpdate.textContent = '10 seconds ago';
+            }, 10000);
+            
+            setTimeout(() => {
+                lastUpdate.textContent = '20 seconds ago';
+            }, 20000);
+            
+            setTimeout(() => {
+                lastUpdate.textContent = '30 seconds ago';
+                updateLastUpdated();
+            }, 30000);
+        }
+        
+        // Simulate real-time updates for the charts
+        function updateCharts() {
+            // Add random variation to the data
+            endpointChart.data.datasets.forEach((dataset) => {
+                dataset.data = dataset.data.map(value => {
+                    const change = (Math.random() - 0.5) * 20;
+                    return Math.max(50, Math.min(500, value + change));
+                });
+            });
+            endpointChart.update();
+            
+            resourceChart.data.datasets[0].data = resourceChart.data.datasets[0].data.map(value => {
+                const change = (Math.random() - 0.5) * 5;
+                return Math.max(20, Math.min(95, value + change));
+            });
+            resourceChart.update();
+            
+            frontendChart.data.datasets[0].data = frontendChart.data.datasets[0].data.map(value => {
+                const change = (Math.random() - 0.5) * 0.3;
+                return Math.max(0.5, Math.min(3, value + change));
+            });
+            frontendChart.update();
+            
+            backendChart.data.datasets[0].data = backendChart.data.datasets[0].data.map(value => {
+                const change = (Math.random() - 0.5) * 10;
+                return Math.max(50, Math.min(150, value + change));
+            });
+            backendChart.update();
+            
+            // Schedule the next update
+            setTimeout(updateCharts, 5000);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate timestamps for x-axis
+            const timestamps = [];
+            const now = new Date();
+            for (let i = 12; i >= 0; i--) {
+                const time = new Date(now.getTime() - i * 5 * 60000);
+                timestamps.push(time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+            }
+            
+            // Endpoint Performance Chart
+            const endpointCtx = document.getElementById('endpointChart').getContext('2d');
+            window.endpointChart = new Chart(endpointCtx, {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [
+                        {
+                            label: '/api/users',
+                            data: [120, 132, 101, 134, 90, 180, 220, 210, 190, 180, 200, 190, 195],
+                            borderColor: '#3498db',
+                            tension: 0.1,
+                            fill: false
+                        },
+                        {
+                            label: '/api/reports',
+                            data: [320, 332, 301, 334, 390, 330, 320, 280, 300, 310, 350, 400, 420],
+                            borderColor: '#e74c3c',
+                            tension: 0.1,
+                            fill: false
+                        },
+                        {
+                            label: '/api/dashboard',
+                            data: [180, 190, 210, 170, 190, 180, 170, 210, 200, 220, 210, 200, 195],
+                            borderColor: '#2ecc71',
+                            tension: 0.1,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Response Time (ms)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Resource Utilization Chart
+            const resourceCtx = document.getElementById('resourceChart').getContext('2d');
+            window.resourceChart = new Chart(resourceCtx, {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [{
+                        label: 'CPU Usage %',
+                        data: [65, 59, 80, 81, 56, 55, 60, 70, 65, 75, 70, 65, 72],
+                        borderColor: '#9b59b6',
+                        backgroundColor: 'rgba(155, 89, 182, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Frontend Performance Chart
+            const frontendCtx = document.getElementById('frontendChart').getContext('2d');
+            window.frontendChart = new Chart(frontendCtx, {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [{
+                        label: 'Page Load Time (s)',
+                        data: [1.8, 2.0, 1.9, 1.7, 1.8, 2.1, 2.2, 2.0, 1.9, 1.8, 1.7, 1.8, 1.8],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Backend Performance Chart
+            const backendCtx = document.getElementById('backendChart').getContext('2d');
+            window.backendChart = new Chart(backendCtx, {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [{
+                        label: 'Query Response Time (ms)',
+                        data: [85, 90, 80, 88, 95, 92, 89, 84, 82, 88, 92, 95, 89],
+                        borderColor: '#16a085',
+                        backgroundColor: 'rgba(22, 160, 133, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Start the real-time updates
+            updateLastUpdated();
+            updateCharts();
+        });
+    </script>
+</body>
+</html>
