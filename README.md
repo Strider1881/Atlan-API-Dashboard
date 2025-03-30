@@ -68,23 +68,24 @@ Optionally use tools like Grafana or Kibana if you want to implement similar das
 
 Steps
 
-1.Clone this repository:<br>
+1. Clone this repository:
 
-bash<br>
-git clone https://github.com/Strider1881/Atlan-API-Observability-Dashboard.git <br>
-cd Atlan-API-Observability-Dashboard<br>
+```bash
+git clone https://github.com/Strider1881/Atlan-API-Observability-Dashboard.git
+cd Atlan-API-Observability-Dashboard
 
-Open the dashboard:<br>
 
-Navigate to assets/Atlan-API-Observability-Dashboard.html.<br>
+2.Open the dashboard:<br>
 
-Open the file in your preferred browser to view the sample dashboard.
+- Navigate to assets/Atlan-API-Observability-Dashboard.html.<br>
+
+- Open the file in your preferred browser to view the sample dashboard.
 
 Review documentation:
 
-Explore docs/observability.pdf for an explanation of the design decisions.
+- Explore docs/observability.pdf for an explanation of the design decisions.
 
-Refer to ATLAN-Internship-Challenge.pdf for challenge details.
+- Refer to ATLAN-Internship-Challenge.pdf for challenge details.
 
 🖥️ Key Components
 Observability Framework: OpenTelemetry
@@ -109,10 +110,11 @@ Logs Added: Correlation IDs for tracing requests across services.
 
 📈 Improvements Achieved:
 
-   Metric	                         Before Solution                        After Solution
-Debugging Time	                     ~4.5 hours	                        ~35 minutes
-Senior Engineer Involvement	       80% of issues	                       25% of issues
-User-reported Problems	              90%	                                    25%
+|   Metric	                       |        Before Solution        |                After Solution   |
+|----------------------------------|-------------------------------|---------------------------------|
+| Debugging Time	                 |    ~4.5 hours	                |        ~35 minutes              |
+| Senior Engineer Involvement	     | 80% of issues	                |       25% of issues             |
+| User-reported Problems	        |      90%	                   |                 25%             |
 
 These improvements have significantly reduced debugging time and enhanced team productivity.
 
